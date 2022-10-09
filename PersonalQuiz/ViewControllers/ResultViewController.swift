@@ -11,36 +11,31 @@ class ResultViewController: UIViewController {
     
     @IBOutlet weak var logoAnimalLabel: UILabel!
     @IBOutlet weak var descriptionLabel: UILabel!
-    // 1. Избавиться от кнопки возврата назад на экране результатов +
-    // 2. Передать массив с ответами на экран с результатами
-    // 3. Определить наиболее часто встречающийся тип животного
-    // 4. Отобразить результаты в соответствии с этим животным
     
     var answers: [Answer]!
 
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationItem.hidesBackButton = true
-        
-        let animal = getAnimalInfo()
-        logoAnimalLabel.text = "Вы - \(animal.rawValue)"
-        descriptionLabel.text = animal.definition
+        getAnimalInfo()
     }
 
     @IBAction func doneButtonPressed(_ sender: UIBarButtonItem) {
         navigationController?.dismiss(animated: true)
     }
     
-    private func getAnimalInfo () -> Animal {
- 
+    private func getAnimalInfo () {
         let animals = answers.map { $0.animal }
         var counts:[Animal:Int] = [:]
         
-        animals.forEach {
-            counts[$0, default: 0] += 1
-        }
+        animals.forEach { counts[$0, default: 0] += 1 }
+
+        guard let animal = counts
+                .sorted(by: { $0.value > $1.value })
+                .first?
+                .key else { return }
         
-        let animal = counts.max { $0.value < $1.value }!.key
-        return animal
+        logoAnimalLabel.text = "Вы - \(animal.rawValue)"
+        descriptionLabel.text = animal.definition
     }
 }
